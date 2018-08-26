@@ -1,4 +1,5 @@
 from celery import Celery
+from celery.exceptions import MaxRetriesExceededError
 from time import sleep
 
 app = Celery('add', broker='pyamqp://guest@localhost//')
@@ -7,6 +8,18 @@ app = Celery('add', broker='pyamqp://guest@localhost//')
 def add(self, x, y):
     print("Y: %s" % y)
     if y == 3:
-        self.retry(countdown=10)
-    sleep(2)
+        try:
+            self.retry(countdown=2)
+        except MaxRetriesExceededError as e:
+            print("Exception: %s" % e)
+            return False
+    sleep(10)
+    return x + y
+
+@app.task(bind=True)
+def add2(self, x, y):
+    print("Y: %s" % y)
+    if y == 3:
+            self.retry(countdown=2)
+    sleep(10)
     return x + y
