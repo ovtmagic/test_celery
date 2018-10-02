@@ -5,4 +5,5 @@ from add import add
 #    add.delay(0,i)
 
 
-add.delay(0,3)
+#add.delay(0,3)
+add.apply_async(args=[0,3])
